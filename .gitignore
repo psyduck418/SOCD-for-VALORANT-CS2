@@ -21,6 +21,7 @@ build_out/
 *.pdb
 *.so
 *.dylib
+*.zip
 
 ## Visual Studio / VS Code / JetBrains files
 .vs/
