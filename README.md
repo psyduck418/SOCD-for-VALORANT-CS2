@@ -6,6 +6,16 @@
 
 ---
 
+## ✨ 安裝教學
+
+### 1. 下載
+- 到 https://github.com/psyduck418/SOCD-for-VALORANT-CS2/releases/tag/v0.0.0 下載 SOCD_PROCESSER.exe
+
+### 2. 安裝
+- 1. 打開 SOCD_PROCESSER.exe
+- 2. 看到WINDOWS 安全警告，點擊其他資訊，再點擊仍要執行
+- 3. 爽爽玩
+
 ## ✨ 核心特色
 
 ### 1. 三種 SOCD 清除模式 (Cleaning Modes)
