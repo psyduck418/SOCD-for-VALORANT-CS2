@@ -1,0 +1,260 @@
+<Window x:Class="SOCD.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SOCD 核心處理器 (管理員模式)"
+        Width="860" Height="680"
+        MinWidth="800" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="#12141d"
+        Foreground="#e0e0e0"
+        FontFamily="Segoe UI"
+        Closing="Window_Closing">
+
+    <Window.Resources>
+        <!-- 主題色調 -->
+        <SolidColorBrush x:Key="AccentBrush" Color="#00e5ff"/>
+        <SolidColorBrush x:Key="PanelBg" Color="#181c2b"/>
+        <SolidColorBrush x:Key="CardBg" Color="#20263a"/>
+        <SolidColorBrush x:Key="KeyOff" Color="#283048"/>
+        <SolidColorBrush x:Key="KeyPhysOn" Color="#00b4d8"/>
+        <SolidColorBrush x:Key="KeyOutOn" Color="#ff0055"/>
+        <SolidColorBrush x:Key="NeutralBrush" Color="#ffb703"/>
+
+        <!-- 按鍵樣式 -->
+        <Style x:Key="KeyIndicator" TargetType="Border">
+            <Setter Property="Width" Value="54"/>
+            <Setter Property="Height" Value="54"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="{StaticResource KeyOff}"/>
+            <Setter Property="BorderBrush" Value="#3a4566"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+
+        <Style x:Key="KeyLabel" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#8892b0"/>
+        </Style>
+
+        <Style x:Key="OutputIndicator" TargetType="Border">
+            <Setter Property="Width" Value="52"/>
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Background" Value="{StaticResource KeyOff}"/>
+            <Setter Property="BorderBrush" Value="#3a4566"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="RadioStyle" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#e0e0e0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="330"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ══════════ 左側控制面板 ══════════ -->
+        <Border Grid.Column="0" Background="{StaticResource PanelBg}" CornerRadius="12" Padding="16" Margin="0,0,10,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- 標題與管理員標籤 -->
+                    <DockPanel Margin="0,0,0,12">
+                        <TextBlock Text="⚡ SOCD 設定" FontSize="18" FontWeight="Bold" Foreground="#ffffff"/>
+                        <Border Background="#1b4332" CornerRadius="4" Padding="6,2" HorizontalAlignment="Right">
+                            <TextBlock Text="🛡️ 管理員已授權" Foreground="#70e000" FontSize="11" FontWeight="Bold"/>
+                        </Border>
+                    </DockPanel>
+
+                    <!-- SOCD 核心模式 -->
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="⚙  SOCD 清除模式"/>
+                    <Border Background="{StaticResource CardBg}" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <RadioButton Style="{StaticResource RadioStyle}"
+                                         Content="中立模式 (Neutral)"
+                                         IsChecked="{Binding IsNeutral, Mode=TwoWay}"
+                                         GroupName="SocdMode"/>
+                            <TextBlock Text="  A+D 抵銷無輸出，W+S 抵銷無輸出" Foreground="#8892b0" FontSize="11" Margin="18,0,0,6"/>
+
+                            <RadioButton Style="{StaticResource RadioStyle}"
+                                         Content="後按優先 (Last Input Priority)"
+                                         IsChecked="{Binding IsLastInput, Mode=TwoWay}"
+                                         GroupName="SocdMode"/>
+                            <TextBlock Text="  最新按下的相反方向覆蓋舊鍵，放開後自動回退" Foreground="#8892b0" FontSize="11" Margin="18,0,0,6"/>
+
+                            <RadioButton Style="{StaticResource RadioStyle}"
+                                         Content="先按優先 (First Input Priority)"
+                                         IsChecked="{Binding IsFirstInput, Mode=TwoWay}"
+                                         GroupName="SocdMode"/>
+                            <TextBlock Text="  先按住的鍵鎖定輸出，第二鍵被完全吞掉" Foreground="#8892b0" FontSize="11" Margin="18,0,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Ctrl 優先互斥功能 -->
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="🎯  Ctrl 優先與互斥功能"/>
+                    <Border Background="{StaticResource CardBg}" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <CheckBox Content=" 啟用 Ctrl 取消 WASD"
+                                      IsChecked="{Binding EnableCtrlPriority, Mode=TwoWay}"
+                                      Foreground="#e0e0e0" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock Text="• 按下 Ctrl 時：立即停止/中斷 WASD 移動&#x0a;• 按住 Ctrl 期間按 WASD：停用 Ctrl 並恢復移動&#x0a;• 放開移動後：若 Ctrl 仍按住則自動恢復 Ctrl"
+                                       Foreground="#8892b0" FontSize="11" Margin="18,6,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 全域攔截開關 -->
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="🌐  全域鍵盤攔截 (Hook)"/>
+                    <Border Background="{StaticResource CardBg}" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <CheckBox Content=" 啟用底層按鍵攔截與清洗"
+                                      IsChecked="{Binding HookEnabled, Mode=TwoWay}"
+                                      Foreground="#e0e0e0" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock Text="  使用 Win32 WH_KEYBOARD_LL 與 SendInput&#x0a;  在遊戲與記事本中即時生效！"
+                                       Foreground="#8892b0" FontSize="11" Margin="18,4,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 狀態指示 -->
+                    <Border Background="#101826" CornerRadius="6" Padding="10" Margin="0,4,0,0" BorderBrush="#203048" BorderThickness="1">
+                        <TextBlock x:Name="StatusText"
+                                   Text="✅ 攔截中 — 請在記事本或遊戲中測試 WASD"
+                                   Foreground="#00e5ff" FontSize="11.5" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ══════════ 右側視覺化面板 ══════════ -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- 1. 實體按鍵狀態 -->
+            <Border Grid.Row="0" Background="{StaticResource PanelBg}" CornerRadius="12" Padding="16" Margin="0,0,0,8">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="📥  實體按鍵輸入 (Physical KeyDown)"/>
+                    <Grid HorizontalAlignment="Center" Margin="0,4,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- W -->
+                        <Border x:Name="PhysKeyW" Grid.Row="0" Grid.Column="1" Style="{StaticResource KeyIndicator}">
+                            <TextBlock Text="W" Style="{StaticResource KeyLabel}"/>
+                        </Border>
+
+                        <!-- A S D -->
+                        <Border x:Name="PhysKeyA" Grid.Row="1" Grid.Column="0" Style="{StaticResource KeyIndicator}">
+                            <TextBlock Text="A" Style="{StaticResource KeyLabel}"/>
+                        </Border>
+                        <Border x:Name="PhysKeyS" Grid.Row="1" Grid.Column="1" Style="{StaticResource KeyIndicator}">
+                            <TextBlock Text="S" Style="{StaticResource KeyLabel}"/>
+                        </Border>
+                        <Border x:Name="PhysKeyD" Grid.Row="1" Grid.Column="2" Style="{StaticResource KeyIndicator}">
+                            <TextBlock Text="D" Style="{StaticResource KeyLabel}"/>
+                        </Border>
+
+                        <!-- Ctrl -->
+                        <Border x:Name="PhysKeyCtrl" Grid.Row="1" Grid.Column="4" Style="{StaticResource KeyIndicator}" Width="70">
+                            <TextBlock Text="Ctrl" Style="{StaticResource KeyLabel}" FontSize="15"/>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 2. SOCD 清洗後最終輸出 -->
+            <Border Grid.Row="1" Background="{StaticResource PanelBg}" CornerRadius="12" Padding="16" Margin="0,0,0,8">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="📤  系統最終接收輸出 (Cleaned Output to OS)"/>
+                    <Grid HorizontalAlignment="Center" Margin="0,4,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Up (W) -->
+                        <Border x:Name="OutKeyW" Grid.Row="0" Grid.Column="1" Style="{StaticResource OutputIndicator}">
+                            <TextBlock Text="▲" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="#667085"/>
+                        </Border>
+
+                        <!-- Left (A) / Center / Right (D) -->
+                        <Border x:Name="OutKeyA" Grid.Row="1" Grid.Column="0" Style="{StaticResource OutputIndicator}">
+                            <TextBlock Text="◄" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="#667085"/>
+                        </Border>
+                        <Border x:Name="OutCenter" Grid.Row="1" Grid.Column="1" Style="{StaticResource OutputIndicator}">
+                            <TextBlock Text="●" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="#667085"/>
+                        </Border>
+                        <Border x:Name="OutKeyD" Grid.Row="1" Grid.Column="2" Style="{StaticResource OutputIndicator}">
+                            <TextBlock Text="►" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="#667085"/>
+                        </Border>
+
+                        <!-- Down (S) -->
+                        <Border x:Name="OutKeyS" Grid.Row="2" Grid.Column="1" Style="{StaticResource OutputIndicator}">
+                            <TextBlock Text="▼" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="#667085"/>
+                        </Border>
+
+                        <!-- Output Ctrl -->
+                        <Border x:Name="OutKeyCtrl" Grid.Row="1" Grid.Column="4" Style="{StaticResource OutputIndicator}" Width="70">
+                            <TextBlock Text="Ctrl" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" FontWeight="Bold" Foreground="#667085"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- 方向文字標籤 -->
+                    <TextBlock x:Name="DirectionText" Text="NEUTRAL"
+                               HorizontalAlignment="Center" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource NeutralBrush}" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 3. 即時事件日誌 -->
+            <Border Grid.Row="2" Background="{StaticResource PanelBg}" CornerRadius="12" Padding="12">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource SectionTitle}" Text="📋  即時決策日誌"/>
+                    <ListBox x:Name="LogListBox"
+                             ItemsSource="{Binding LogEntries}"
+                             Background="Transparent"
+                             Foreground="#a0aec0"
+                             BorderThickness="0"
+                             FontFamily="Cascadia Mono, Consolas, Courier New"
+                             FontSize="12"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
