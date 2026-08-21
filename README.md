@@ -2,7 +2,7 @@
 
 高效、低延遲的 Windows 系統級 **SOCD（Simultaneous Opposite Cardinal Direction，同時相反方向輸入）清除與處理器**。
 
-基於 **.NET 9 + WPF** 與 Win32 低階鍵盤鉤子 (`WH_KEYBOARD_LL`) + `SendInput` 打造，支援在各類遊戲（格鬥遊戲、FPS、跑跑卡丁車等）及應用程式中即時攔截並過濾相反方向按鍵。
+基於 **.NET 9 + WPF** 與 Win32 低階鍵盤鉤子 (`WH_KEYBOARD_LL`) + `SendInput` 打造，支援在FPS遊戲中即時攔截並過濾相反方向按鍵。
 
 ---
 
