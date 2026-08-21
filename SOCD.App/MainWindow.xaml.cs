@@ -2,13 +2,25 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
+using Color = System.Windows.Media.Color;
+using System.Windows.Forms;
 using SOCD.App.Interop;
 using SOCD.App.ViewModels;
+using System.Diagnostics;
+using System.Drawing; // 需確保有引用 System.Drawing
+using System.Runtime.InteropServices;
 
 namespace SOCD.App;
 
 public partial class MainWindow : Window
 {
+
+    [DllImport("psapi.dll")]
+    private static extern int EmptyWorkingSet(IntPtr hwProc);
+
+    // 改成可空型別 (Nullable) 就不會有警告了
+    private System.Windows.Forms.NotifyIcon? _notifyIcon;
+
     private readonly MainViewModel _vm = new();
     private readonly LowLevelKeyboardHook _hook;
 
@@ -31,6 +43,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        // 設定系統列（右下角）小圖示
+        InitTrayIcon();
+        // 當視窗內容完全渲染完成後執行清理
+        this.ContentRendered += (s, e) => FlushMemory();
         DataContext = _vm;
 
         // 初始化鍵盤鉤子並與 SocdProcessor 綁定
@@ -50,7 +66,7 @@ public partial class MainWindow : Window
             if (enabled)
             {
                 _hook.Install();
-                StatusText.Text = "✅ 攔截中 — 請在記事本或遊戲中測試 WASD";
+                StatusText.Text = "✅ 攔截中 — 請記得在SOCD模式設定完成後將此程式視窗最小化，已取得最佳效能。若要再次調整設定或關閉此程式，可以在工作列右下角點擊^圖示，雙擊點開此應用程式。";
                 StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x00, 0xe5, 0xff));
             }
             else
@@ -68,6 +84,54 @@ public partial class MainWindow : Window
         _hook.Install();
         RefreshVisuals();
     }
+
+    private void InitTrayIcon()
+        {
+            _notifyIcon = new NotifyIcon
+            {
+                Icon = SystemIcons.Application, // 使用預設圖示，也可以換成自己的 .ico
+                Visible = true,
+                Text = "SOCD 處理器 (運作中)"
+            };
+
+            // 點擊右下角圖示重新顯示視窗
+            _notifyIcon.Click += (s, e) =>
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+                this.Activate();
+            };
+        }
+
+        // 攔截視窗最小化事件：不最小化，而是直接隱藏視窗（Hide）
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (this.WindowState == WindowState.Minimized)
+            {
+                this.Hide(); // 隱藏 WPF UI 視窗
+                FlushMemory(); // 強制釋放記憶體至 3MB~8MB
+            }
+            base.OnStateChanged(e);
+        }
+
+        // 當程式徹底關閉時釋放圖示
+        protected override void OnClosed(EventArgs e)
+        {
+            _notifyIcon?.Dispose();
+            base.OnClosed(e);
+        }
+
+        public static void FlushMemory()
+        {
+            try
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                EmptyWorkingSet(Process.GetCurrentProcess().Handle);
+            }
+            catch { }
+        }
 
     private void RefreshVisuals()
     {

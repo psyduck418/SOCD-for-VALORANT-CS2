@@ -129,13 +129,18 @@
                                        Foreground="#8892b0" FontSize="11" Margin="18,4,0,0" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
+                    <Border Background="#101826" CornerRadius="6" Padding="10" BorderBrush="#203048" BorderThickness="1" Height="110" Width="286">
+                        <Border Background="#101826" CornerRadius="6" Padding="10" BorderBrush="#203048" BorderThickness="1" Height="101" Width="250">
+                            <TextBlock x:Name="StatusText"
+                                Text="✅ 攔截中 — 請記得在SOCD模式設定完成後將此程式視窗最小化，已取得最佳效能。若要再次調整設定或關閉此程式，可以在工作列右下角點擊^圖示，雙擊點開此應用程式。"
+                                Foreground="#00e5ff" FontSize="11.5" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,-1" Width="228"/>
+
+                        </Border>
+
+                    </Border>
 
                     <!-- 狀態指示 -->
-                    <Border Background="#101826" CornerRadius="6" Padding="10" Margin="0,4,0,0" BorderBrush="#203048" BorderThickness="1">
-                        <TextBlock x:Name="StatusText"
-                                   Text="✅ 攔截中 — 請在記事本或遊戲中測試 WASD"
-                                   Foreground="#00e5ff" FontSize="11.5" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                    </Border>
+
                 </StackPanel>
             </ScrollViewer>
         </Border>
@@ -149,7 +154,7 @@
             </Grid.RowDefinitions>
 
             <!-- 1. 實體按鍵狀態 -->
-            <Border Grid.Row="0" Background="{StaticResource PanelBg}" CornerRadius="12" Padding="16" Margin="0,0,0,8">
+            <Border Grid.Row="0" Background="{StaticResource PanelBg}" CornerRadius="12" Padding="16" Margin="0,0,10,8">
                 <StackPanel>
                     <TextBlock Style="{StaticResource SectionTitle}" Text="📥  實體按鍵輸入 (Physical KeyDown)"/>
                     <Grid HorizontalAlignment="Center" Margin="0,4,0,0">
