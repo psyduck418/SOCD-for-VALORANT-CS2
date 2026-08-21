@@ -9,7 +9,7 @@
 ## ✨ 安裝教學
 
 ### 1. 下載
-- 到 https://github.com/psyduck418/SOCD-for-VALORANT-CS2/releases/tag/1.0.0 下載 SOCD_PROCESSER.exe
+- 到 https://github.com/psyduck418/SOCD-for-VALORANT-CS2/releases/tag/V1.1.0 下載 SOCD_PROCESSER.exe
 
 ### 2. 安裝
 - 1. 打開 SOCD_PROCESSER.exe
